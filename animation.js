@@ -37,7 +37,7 @@ var Animation = {
 		var s0 = sprite.scale.x;
 		var y0 = sprite.y;
 		sprite.inputEnabled = false;
-		sprite.scale.setTo(s0*4);
+		sprite.scale.setTo(s0*2);
 		sprite.y -= game.world.height;
 		var u = game.add.tween(sprite.scale)
 			.to({x: s0, y: s0}, 1500, Phaser.Easing.Bounce.Out);

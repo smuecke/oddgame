@@ -10,13 +10,13 @@ mainMenuState.prototype = {
         game.load.image('background', "res/background.jpg");
         game.load.image('item', "res/Silber1.png");
         
-        //game.load.bitmapFont('pixel', "fonts/PixelLCD-7.ttf");
+        game.load.bitmapFont('LicensePlate', "fonts/LicensePlate.png", "fonts/LicensePlate.fnt");
     },
 
     create: function() {
         game.add.tileSprite(0, 0, 720, 1325, 'background');
         
-        text = game.add.text(game.world.centerX, 200, "START GAME");
+        text = game.add.bitmapText(game.world.centerX, 150, "LicensePlate", "START GAME", 60);
         text.anchor.setTo(0.5, 0.5);
         text.fontSize = 90;
         text.fill = "white";

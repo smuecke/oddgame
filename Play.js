@@ -17,6 +17,7 @@ var ROTATIONS = [[0, 60, 120, 180, -120, -60],
                  [60, 120, 180, -120, -60, 0]];
 
 var score = 0;
+var timer_text, timer;
 
 playState.prototype = {
     preload: function() {
@@ -31,12 +32,29 @@ playState.prototype = {
     create: function() {
         game.add.tileSprite(0, 0, 720, 1325, 'background');
         
+        // timer
+        timer_text = game.add.bitmapText(15, 15, "LicensePlate", "0", 80);
+        timer = game.time.create(false);
+        timer.loop(10, updateTime);
+        
+        // score
+        score_text = game.add.bitmapText(game.world.centerX, 15, "LicensePlate", "0", 80);
+        
         HexField.init();
+        HexField.intro();
+        
         HexField.difficulty = 0;
-        HexField.shuffle();
-        HexField.draw();
+        game.time.events.add(2000, function() {
+          HexField.shuffle();
+          HexField.draw();
+          timer.start();
+        }, this);
     }
 };
+
+function updateTime() {
+  timer_text.setText(timer.seconds.toFixed(2));
+}
 
 var hex_to_pix = function(u, v) {
   return {
@@ -50,7 +68,7 @@ var HexField = {
   u: [-2, -2, -2, -1, -1, -1, -1,  0, 0, 0,  1, 1, 1,  2,  2, 2, 2,  3,  3, 3],
   v: [ 0,  1,  2, -1,  0,  1,  2, -2, 0, 1, -1, 0, 2, -2, -1, 0, 1, -2, -1, 0],
   
-  /* colors (f = 0..5) and rotations (r = 0..2) */
+  /* colors (f = 0..5) and rotations (r = 0..5) */
   f: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   r: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   
@@ -58,10 +76,10 @@ var HexField = {
   p: 0,
   
   /* difficulty settings */
-  _F:        [2, 2, 3, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6],
-  _R:        [6, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3],
-  _uniqueF : [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  _uniqueR : [1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  _F:        [2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 4, 5, 6, 1, 2, 3, 4, 5, 6],
+  _R:        [2, 3, 4, 5, 6, 3, 4, 5, 6, 4, 5, 6, 5, 6, 6, 2, 2, 2, 3, 3, 3, 4, 5, 6],
+  _uniqueF : [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  _uniqueR : [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   
   difficulty : 0, /* index of above list (0..18) */
   
@@ -77,12 +95,18 @@ var HexField = {
       sprite.events.onInputDown.add(function (sprite) {
         if (sprite.name["index"] == HexField.p) {
           Animation.click(sprite);
-          score++;
+          
           HexField.difficulty = Math.min(Math.floor(score / 5), 18);
           HexField.shuffle();
           HexField.draw();
+          
+          score++;
+          score_text.setText(score);
+          Animation.click(score);
         } else {
           Animation.shake(sprite);
+          score--;
+          score_text.setText(score);
         }
       });
       sprite.inputEnabled = true;
@@ -131,6 +155,28 @@ var HexField = {
     this.r[this.p] = this.r[0];
     this.f[0] = cF;
     this.r[0] = cR;
+  },
+  
+  intro: function() {
+    var u, v, pt, sprite;
+    for (i = 0; i < this.u.length; i++) {
+      u = this.u[i];
+      v = this.v[i];
+      pt = hex_to_pix(u, v);
+      
+      sprite = this._sprites[i];
+      sprite.x = pt.x;
+      sprite.y = pt.y;
+      
+      this.f[i] = game.rnd.integerInRange(0, 5);
+      this.r[i] = game.rnd.integerInRange(0, 5);
+      
+      sprite.name.r = this.r[i];
+      sprite.loadTexture(IMGKEYS[this.r[i]]);
+      sprite.tint = TINTS[this.f[i]];
+      
+      Animation.fall_in_place(sprite);
+    }
   },
   
   draw: function () {
