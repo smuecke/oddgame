@@ -25,14 +25,13 @@ The commendable way:
    cd /foo/oddgame
    ```
 3. Start local HTTP server, e.g. using python:  
-   ```
+   
+   ```sh
+   # Python 2.x OR ...
    python -m SimpleHTTPServer
+   # Python 3.x
+   python -m http.server 
    ```
 4. Open your browser and navigate to `localhost:8000`
 
-Quick and dirty way:
-
-1. Clone repository
-2. Open `index.html` in your preferred browser
-
-You’ll probably need to zoom out the page a bit to fit the entire canvas on your screen; the canvas has slightly awkward dimensions because I intend this to become a mobile game, and I just used the screen resolution of my own mobile phone.
+Note that it is no longer possible to open `index.html` directly due to issues with CORS (Cross-Origin Resource Sharing). For further information s. https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp.
